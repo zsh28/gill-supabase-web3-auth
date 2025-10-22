@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ArrowRight, BookOpen, CookingPot, Droplets, LucideWallet, MessageCircleQuestion } from 'lucide-react'
 import React from 'react'
 import { AppHero } from '@/components/app-hero'
+import WalletLogin from '@/components/auth/wallet-login'
 
 const primary: {
   label: string
@@ -50,6 +51,14 @@ export default function DashboardFeature() {
     <div>
       <AppHero title="gm" subtitle="Say hi to your new Solana app." />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Authentication Section */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-center mb-8">Wallet Authentication</h2>
+          <div className="flex justify-center">
+            <WalletLogin />
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {primary.map((link) => (
             <a key={link.label} href={link.href} target="_blank" rel="noopener noreferrer" className="block group">
