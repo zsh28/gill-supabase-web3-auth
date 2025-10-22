@@ -12,6 +12,8 @@ import { ellipsify, UiWallet, useWalletUi, useWalletUiWallet } from '@wallet-ui/
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/components/auth/auth-provider'
+import { useCombinedSignOut } from '@/hooks/use-combined-signout'
 
 function WalletAvatar({ className, wallet }: { className?: string; wallet: UiWallet }) {
   return (
@@ -41,6 +43,19 @@ function WalletDropdownItem({ wallet }: { wallet: UiWallet }) {
 
 function WalletDropdown() {
   const { account, connected, copy, disconnect, wallet, wallets } = useWalletUi()
+  const { user } = useAuth()
+  const { handleSignOut } = useCombinedSignOut()
+
+  const handleDisconnect = () => {
+    if (user) {
+      // If user is authenticated, sign out and disconnect
+      handleSignOut()
+    } else {
+      // If not authenticated, just disconnect wallet
+      disconnect()
+    }
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -55,8 +70,8 @@ function WalletDropdown() {
             <DropdownMenuItem className="cursor-pointer" onClick={copy}>
               Copy address
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer" onClick={disconnect}>
-              Disconnect
+            <DropdownMenuItem className="cursor-pointer" onClick={handleDisconnect}>
+              {user ? 'Sign Out & Disconnect' : 'Disconnect'}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>

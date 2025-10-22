@@ -8,6 +8,7 @@ import { useSolana } from '@/components/solana/use-solana'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from './auth-provider'
 import { useWalletAuthMutation } from '@/hooks/use-wallet-auth'
+import { useCombinedSignOut } from '@/hooks/use-combined-signout'
 
 // Extend Window interface to include solana
 declare global {
@@ -27,7 +28,8 @@ export default function WalletLogin() {
   const [message, setMessage] = useState('')
   const router = useRouter()
   const { connected, account } = useSolana()
-  const { user, signOut } = useAuth()
+  const { user } = useAuth()
+  const { handleSignOut } = useCombinedSignOut()
 
   // Use TanStack Query for API calls
   const walletAuthMutation = useWalletAuthMutation()
@@ -46,8 +48,7 @@ export default function WalletLogin() {
       // Check if window.solana is available for signing
       if (typeof window !== 'undefined' && window.solana) {
         try {
-          // Use Supabase's signInWithWeb3 with the global window.solana object
-          // This will automatically handle the message signing with the actual wallet
+          // Use Supabase's signInWithWeb3 - domain/URI should be configured in Supabase dashboard
           const { data, error } = await supabase.auth.signInWithWeb3({
             chain: 'solana',
             statement: 'I accept the Terms of Service and authorize this wallet connection.',
@@ -89,8 +90,8 @@ export default function WalletLogin() {
     }
   }
 
-  const handleSignOut = async () => {
-    await signOut()
+  const handleSignOutAndDisconnect = async () => {
+    await handleSignOut()
     setMessage('Signed out successfully')
   }
 
@@ -110,7 +111,7 @@ export default function WalletLogin() {
               <Button onClick={() => router.push('/account')} className="w-full">
                 View Account Details
               </Button>
-              <Button onClick={handleSignOut} variant="outline" className="w-full">
+              <Button onClick={handleSignOutAndDisconnect} variant="outline" className="w-full">
                 Sign Out
               </Button>
             </div>
