@@ -45,7 +45,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     getInitialSession()
 
-    // Listen for auth changes (including automatic token refresh)
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, newSession) => {
@@ -59,15 +58,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  // Removed automatic wallet disconnection monitoring
-  // Users can manually sign out when needed
-
   const signOut = async () => {
     try {
-      // Sign out from Supabase
       await supabase.auth.signOut()
-
-      // Clear localStorage manually as a backup
       if (typeof window !== 'undefined') {
         const keys = Object.keys(localStorage)
         keys.forEach((key) => {
@@ -77,15 +70,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         })
       }
 
-      // Reset state immediately
       setUser(null)
       setSession(null)
     } catch (error) {
       console.error('Error during sign out:', error)
 
-      // Force cleanup even if signOut fails
       if (typeof window !== 'undefined') {
-        localStorage.clear() // Clear everything as last resort
+        localStorage.clear()
       }
 
       // Reset state

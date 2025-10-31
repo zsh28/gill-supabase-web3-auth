@@ -9,7 +9,6 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from './auth-provider'
 import { useCombinedSignOut } from '@/hooks/use-combined-signout'
 
-// Extend Window interface to include solana
 declare global {
   interface Window {
     solana?: {
@@ -38,11 +37,8 @@ export default function WalletLogin() {
         setMessage('Please connect a wallet first')
         return
       }
-
-      // Check if window.solana is available for signing
       if (typeof window !== 'undefined' && window.solana) {
         try {
-          // Use Supabase's signInWithWeb3 - domain/URI should be configured in Supabase dashboard
           const { data, error } = await supabase.auth.signInWithWeb3({
             chain: 'solana',
             statement: 'Please sign this message to authenticate with your wallet.',
