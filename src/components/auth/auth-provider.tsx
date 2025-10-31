@@ -49,25 +49,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, newSession) => {
-      console.log(
-        'Auth state change:',
-        event,
-        newSession?.expires_at ? new Date(newSession.expires_at * 1000) : 'No expiry',
-      )
-
       setSession(newSession)
       setUser(newSession?.user ?? null)
       setLoading(false)
-
-      // Log token expiry info for debugging
-      if (newSession?.expires_at) {
-        const expiryTime = new Date(newSession.expires_at * 1000)
-        const timeUntilExpiry = expiryTime.getTime() - Date.now()
-        console.log(`Token expires at: ${expiryTime.toISOString()}`)
-        console.log(`Time until expiry: ${Math.round(timeUntilExpiry / 1000 / 60)} minutes`)
-      }
-
-      // No automatic redirect - let users navigate manually
     })
 
     return () => {
@@ -75,30 +59,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  // Monitor wallet connection status - sign out if wallet is disconnected
-  useEffect(() => {
-    // Only check wallet connection if user is authenticated
-    if (!user) return
-
-    const checkWalletConnection = () => {
-      // Check if window.solana is available and connected
-      if (typeof window !== 'undefined' && window.solana) {
-        // Some wallets expose a connected property
-        if ('connected' in window.solana && !window.solana.connected) {
-          console.log('Wallet disconnected, signing out user')
-          signOut()
-        }
-      }
-    }
-
-    // Check immediately
-    checkWalletConnection()
-
-    // Set up periodic check every 5 seconds
-    const interval = setInterval(checkWalletConnection, 5000)
-
-    return () => clearInterval(interval)
-  }, [user])
+  // Removed automatic wallet disconnection monitoring
+  // Users can manually sign out when needed
 
   const signOut = async () => {
     try {
